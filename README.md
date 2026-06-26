@@ -22,6 +22,14 @@ A personal blog built to keep track of interesting things I do, learn and whatev
     - Editor
     - Settings / profile
 
+## High-Level Architecture
+- backend
+    - api/ = transport
+    - services/
+    - db/
+    - schemas/
+    - core/
+
 ## API
 - Public API
     - GET /api/posts
@@ -48,4 +56,4 @@ A personal blog built to keep track of interesting things I do, learn and whatev
     - PATCH  /api/admin/profile
 
 ## Data Model
-![db-model](assets/db_model.png)
+![data model](assets/db_model.png)
