@@ -1,20 +1,10 @@
 import { PawPrint } from "lucide-react";
 import { useState, useEffect } from "react";
 
+import { useAuth } from "../../states/AuthState";
+
 export function PublicHeader() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-    useEffect(() => {
-        // Check authentication status from localStorage or API
-        const authToken = localStorage.getItem("authToken");
-        setIsAuthenticated(!!authToken);
-    }, []);
-
-    const handleSignOut = () => {
-        localStorage.removeItem("authToken");
-        setIsAuthenticated(false);
-        window.location.href = "/";
-    };
+    const { isAuthenticated, logout } = useAuth();
 
     return (
         <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
@@ -43,7 +33,7 @@ export function PublicHeader() {
                             <a href="/dashboard" className="text-sm font-medium text-slate-600 hover:text-emerald-600">
                                 Workspace
                             </a>
-                            <button onClick={handleSignOut} className="text-sm font-medium text-slate-600 hover:text-emerald-600">
+                            <button onClick={logout} className="text-sm font-medium text-slate-600 hover:text-emerald-600">
                                 Sign out
                             </button>
                         </div>
