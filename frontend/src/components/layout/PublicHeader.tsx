@@ -1,5 +1,4 @@
 import { PawPrint } from "lucide-react";
-import { useState, useEffect } from "react";
 
 import { useAuth } from "../../states/AuthState";
 
@@ -22,15 +21,15 @@ export function PublicHeader() {
                     <a href="/" className="text-sm font-medium text-slate-600 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded px-1">
                         Articles
                     </a>
-                    <a href="/category" className="text-sm font-medium text-slate-600 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded px-1 hidden sm:inline">
+                    <a href="/categories" className="text-sm font-medium text-slate-600 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded px-1 hidden sm:inline">
                         Categories
                     </a>
-                    <a href="/tag" className="text-sm font-medium text-slate-600 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded px-1 hidden sm:inline">
-                        Topics
+                    <a href="/tags" className="text-sm font-medium text-slate-600 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded px-1 hidden sm:inline">
+                        Tags
                     </a>
                     {isAuthenticated ? (
                         <div className="flex items-center gap-6">
-                            <a href="/dashboard" className="text-sm font-medium text-slate-600 hover:text-emerald-600">
+                            <a href="/workspace" className="text-sm font-medium text-slate-600 hover:text-emerald-600">
                                 Workspace
                             </a>
                             <button onClick={logout} className="text-sm font-medium text-slate-600 hover:text-emerald-600">

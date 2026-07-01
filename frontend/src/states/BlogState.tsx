@@ -247,8 +247,8 @@ export class BlogState implements IBlogState {
         return EMPTY_POST;
     }
 
-    _hasPosts(): boolean {
-        return this.posts.length > 0;
+    _hasFeaturedPosts(): boolean {
+        return this.posts.some((p) => p.is_featured);
     }
 
     _relatedPosts(): Post[] {

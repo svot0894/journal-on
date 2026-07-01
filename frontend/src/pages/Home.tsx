@@ -72,6 +72,10 @@ export default function Home() {
         )
     };
 
+    const hasFilters =
+        blogState.search_query.trim() !== "" ||
+        blogState.selected_category !== "All";
+
     return (
         <main className="font-['Inter'] bg-stone-50 min-h-screen">
             <PublicHeader />
@@ -93,33 +97,58 @@ export default function Home() {
                         </div>
                     </div>
                 )}
-                {blogState._hasPosts() && (
-                    <>
-                        <a href={`/post/${featuredPostId}`} className="flex flex-col md:flex-row bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-emerald-300 transition-all mb-12">
-                            <div className="md:w-1/2 overflow-hidden">
-                                <img src={featuredPost.cover_image ?? undefined} className="w-full h-72 md:h-full object-cover" />
-                            </div>
-                            <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <span className="text-xs font-semibold tracking-wide text-emerald-600 uppercase">Featured Paw-post</span>
-                                    <span className="text-slate-300">•</span>
-                                    <span className="text-xs font-medium text-slate-600">{`${featuredPost.category}`}</span>
-                                </div>
-                                <h2 className="text-3xl font-semibold text-slate-900 mb-4 leading-tight hover:text-emerald-700 transition-colors">{`${featuredPost.title}`}</h2>
-                                <p className="text-slate-600 mb-6">{`${featuredPost.excerpt}`}</p>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm text-slate-500">{`${featuredPost.published_date}`}</span>
-                                    <span className="text-slate-300">•</span>
-                                    <span className="text-sm text-slate-500">{`${featuredPost.read_time}`}</span>
-                                </div>
-                            </div>
-                        </a>
-                        <div className="flex flex-col items-center justify-center py-16 bg-white border border-slate-200 rounded-2xl mb-12">
-                            <PawPrint className="h-8 w-8 text-emerald-500 mb-3" />
-                            <h2 className="text-xl font-semibold text-slate-900 mb-1">No articles in the kennel yet</h2>
-                            <p className="text-sm text-slate-600 max-w-md text-center">Check back soon - fresh posts are being fetched!</p>
+                {blogState._hasFeaturedPosts() ? (
+                    <a
+                        href={`/post/${featuredPostId}`}
+                        className="flex flex-col md:flex-row bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-emerald-300 transition-all mb-12"
+                    >
+                        <div className="md:w-1/2 overflow-hidden">
+                            <img
+                                src={featuredPost.cover_image ?? undefined}
+                                className="w-full h-72 md:h-full object-cover"
+                            />
                         </div>
-                    </>
+
+                        <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className="text-xs font-semibold tracking-wide text-emerald-600 uppercase">
+                                    Featured Paw-post
+                                </span>
+                                <span className="text-slate-300">•</span>
+                                <span className="text-xs font-medium text-slate-600">
+                                    {featuredPost.category}
+                                </span>
+                            </div>
+
+                            <h2 className="text-3xl font-semibold text-slate-900 mb-4 leading-tight hover:text-emerald-700 transition-colors">
+                                {featuredPost.title}
+                            </h2>
+
+                            <p className="text-slate-600 mb-6">
+                                {featuredPost.excerpt}
+                            </p>
+
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-slate-500">
+                                    {featuredPost.published_date}
+                                </span>
+                                <span className="text-slate-300">•</span>
+                                <span className="text-sm text-slate-500">
+                                    {featuredPost.read_time}
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                ) : (
+                    <div className="flex flex-col items-center justify-center py-16 bg-white border border-slate-200 rounded-2xl mb-12">
+                        <PawPrint className="h-8 w-8 text-emerald-500 mb-3" />
+                        <h2 className="text-xl font-semibold text-slate-900 mb-1">
+                            No featured articles in the kennel yet.
+                        </h2>
+                        <p className="text-sm text-slate-600 max-w-md text-center">
+                            Check back soon - fresh posts are being fetched!
+                        </p>
+                    </div>
                 )}
                 <div>
                     <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
@@ -133,7 +162,7 @@ export default function Home() {
                                 Topics
                             </a>
                         </div>
-                        <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+                        <div className="flex items-center relative justify-between mb-6 flex-wrap gap-4">
                             <SearchIcon className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                             <input
                                 type="text"
@@ -149,17 +178,29 @@ export default function Home() {
                     <div className="flex flex-wrap gap-2 mb-8">
                         {blogState._categories().map(categoryPill)}
                     </div>
-                    {blogState._hasResults() && (
-                        <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {blogState._filteredPosts().map(postCard)}
-                            </div>
-                            <div className="flex flex-col items-center justify-center py-16 bg-white border border-slate-200 rounded-xl">
-                                <SearchXIcon className="h-8 w-8 text-slate-400 mb-3" />
-                                <p className="text-slate-600 mb-3">No articles match your filters.</p>
-                                <button className="text-sm font-medium text-emerald-600 hover:text-emerald-700" onClick={blogState._clearSearch()}>Clear filters</button>
-                            </div>
-                        </>
+                    {blogState._hasResults() ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {blogState._filteredPosts().map(postCard)}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-16 bg-white border border-slate-200 rounded-xl">
+                            <SearchXIcon className="h-8 w-8 text-slate-400 mb-3" />
+
+                            <p className="text-slate-600 mb-3">
+                                {hasFilters
+                                    ? "No articles match your filters."
+                                    : "There are no published articles yet."}
+                            </p>
+
+                            {hasFilters && (
+                                <button
+                                    className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
+                                    onClick={() => blogState._clearSearch()}
+                                >
+                                    Clear filters
+                                </button>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>
