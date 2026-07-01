@@ -1,12 +1,21 @@
+import { useState, useReducer, useEffect } from "react";
 import { PublicHeader } from "../components/layout/PublicHeader";
 import { BlogState } from "../states/BlogState";
 import type { Post } from "../states/BlogState";
 import { HashIcon, SearchIcon, SearchXIcon, CircleAlertIcon, PawPrint } from "lucide-react";
 
 export default function Home() {
-    const blogState = new BlogState();
+    const [blogState] = useState(() => new BlogState());
+
+    const [, forceRender] = useReducer((value) => value + 1, 0);
+
+    useEffect(() => {
+        blogState._loadInitialData().then(() => {
+            forceRender();
+        });
+    }, [blogState]);
+
     const featuredPost = blogState._featuredPost();
-    console.log(featuredPost);
     const featuredPostId = featuredPost.id;
 
     const categoryPill = (cat: string) => {
@@ -36,7 +45,7 @@ export default function Home() {
             >
                 <div className="overflow-hidden border-b border-slate-200">
                     <img
-                        src={post.cover_image}
+                        src={post.cover_image ?? undefined}
                         alt={post.title}
                         className="w-full h-44 object-cover"
                     />
@@ -88,7 +97,7 @@ export default function Home() {
                     <>
                         <a href={`/post/${featuredPostId}`} className="flex flex-col md:flex-row bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-emerald-300 transition-all mb-12">
                             <div className="md:w-1/2 overflow-hidden">
-                                <img src={`${featuredPost.cover_image}`} className="w-full h-72 md:h-full object-cover" />
+                                <img src={featuredPost.cover_image ?? undefined} className="w-full h-72 md:h-full object-cover" />
                             </div>
                             <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
                                 <div className="flex items-center gap-2 mb-4">

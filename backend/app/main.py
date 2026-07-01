@@ -6,12 +6,13 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5173",
-    "localhost:5173"
+    "localhost:5173",
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https://.*\.app\.github\.dev",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -67,8 +68,8 @@ async def get_authors():
             detail=f"Failed to fetch posts: {str(e)}"
         )
 
-@app.get("/api/posts")
-async def get_posts():
+@app.get("/api/posts/{post_id}")
+async def get_post(post_id: str):
     client = get_supabase()
 
     if client is None:
@@ -81,15 +82,16 @@ async def get_posts():
         result = (
             client.table("blog_posts")
             .select("*")
+            .eq("id", post_id)
             .eq("status", "published")
-            .order("published_date", desc=True)
+            .limit(1)
             .execute()
         )
         return result.data or []
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to fetch posts: {str(e)}"
+            detail=f"Failed to fetch post: {str(e)}"
         )
 
 #Run the app

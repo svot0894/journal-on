@@ -241,7 +241,7 @@ export class BlogState implements IBlogState {
         let published = this.posts.filter((p) => p.status === "published");
         for (const p of published) {
             if (p.is_featured) {
-                return [p];
+                return p;
             }
         }
         return EMPTY_POST;
@@ -284,7 +284,7 @@ export class BlogState implements IBlogState {
 
     async _fetchPosts(): Promise<Post[]> {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/posts`);
+            const response = await fetch(`https://humble-enigma-97w69g97xqvq2pqvq-8000.app.github.dev/api/posts`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch posts: ${response.status} ${response.statusText}`);
             }
@@ -300,7 +300,7 @@ export class BlogState implements IBlogState {
 
     async _fetchAuthor(): Promise<Author> {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/authors`);
+            const response = await fetch(`https://humble-enigma-97w69g97xqvq2pqvq-8000.app.github.dev/api/authors`);
             if (!response.ok) {
                 return DEFAULT_AUTHOR;
             }
@@ -377,7 +377,7 @@ export class BlogState implements IBlogState {
         }
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/posts/${postId}`);
+            const response = await fetch(`https://humble-enigma-97w69g97xqvq2pqvq-8000.app.github.dev/api/posts/${postId}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch post: ${response.status} ${response.statusText}`);
             }
