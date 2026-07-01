@@ -24,7 +24,10 @@ export default function Home() {
         return (
             <button
                 key={cat}
-                onClick={() => blogState._selectCategory(cat)}
+                onClick={() => {
+                    blogState._selectCategory(cat);
+                    forceRender();
+                }}
                 className={
                     isSelected
                         ? "px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-600 text-white border border-emerald-600"
@@ -155,11 +158,11 @@ export default function Home() {
                         <h2 className="text-2xl font-semibold text-slate-900">Latest articles</h2>
                         <div className="hidden md:flex items-center gap-2">
                             <a
-                                href="/tag"
+                                href="/tags"
                                 className="inline-flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-emerald-700 px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             >
                                 <HashIcon className="h-3.5 w-3.5" />
-                                Topics
+                                Tags
                             </a>
                         </div>
                         <div className="flex items-center relative justify-between mb-6 flex-wrap gap-4">
@@ -170,6 +173,7 @@ export default function Home() {
                                 value={blogState.search_query}
                                 onChange={(event) => {
                                     blogState._setSearchQuery(event.target.value);
+                                    forceRender();
                                 }}
                                 className="pl-9 pr-4 py-2 rounded-md border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 w-64"
                             ></input>
@@ -195,7 +199,10 @@ export default function Home() {
                             {hasFilters && (
                                 <button
                                     className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
-                                    onClick={() => blogState._clearSearch()}
+                                    onClick={() => {
+                                        blogState._clearSearch();
+                                        forceRender();
+                                    }}
                                 >
                                     Clear filters
                                 </button>
