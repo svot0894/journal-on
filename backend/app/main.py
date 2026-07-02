@@ -1,18 +1,25 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.supabase import get_supabase
+import os
+import logging
 
-app = FastAPI()
+# App metadata
+app = FastAPI(title="journal-on", version=os.getenv("APP_VERSION", "1.0.0"))
 
-origins = [
-    "http://localhost:5173",
-    "localhost:5173",
-]
+# Configure logging for production
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(level=LOG_LEVEL)
+logger = logging.getLogger("journal-on")
+
+cors_origins = os.getenv("CORS_ORIGINS")
+if cors_origins:
+    origins = [o.strip() for o in cors_origins.split(",") if o.strip()]
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_origin_regex=r"https://.*\.app\.github\.dev",
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -40,10 +47,8 @@ async def get_posts():
         )
         return result.data or []
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to fetch posts: {str(e)}"
-        )
+        logger.exception("Failed to fetch posts")
+        raise HTTPException(status_code=500, detail="Failed to fetch posts")
 
 
 @app.get("/api/posts/{post_id}")
@@ -67,10 +72,8 @@ async def get_post(post_id: str):
         )
         return result.data or []
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to fetch post: {str(e)}"
-        )
+        logger.exception("Failed to fetch post %s", post_id)
+        raise HTTPException(status_code=500, detail="Failed to fetch post")
 
 @app.get("/api/tags")
 async def get_tags():
@@ -102,10 +105,8 @@ async def get_tags():
 
         return sorted(unique_tags)
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to fetch tags: {str(e)}"
-        )
+        logger.exception("Failed to fetch tags")
+        raise HTTPException(status_code=500, detail="Failed to fetch tags")
 
 @app.get("/api/tags/{tag_name}/posts")
 async def get_posts_by_tag(tag_name: str):
@@ -128,10 +129,8 @@ async def get_posts_by_tag(tag_name: str):
         )
         return result.data or []
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to fetch {tag_name}-related posts: {str(e)}"
-        )
+        logger.exception("Failed to fetch posts for tag %s", tag_name)
+        raise HTTPException(status_code=500, detail="Failed to fetch tag-related posts")
 
 @app.get("/api/categories")
 async def get_categories():
@@ -161,10 +160,8 @@ async def get_categories():
 
         return sorted(unique_categories)
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to fetch categories: {str(e)}"
-        )
+        logger.exception("Failed to fetch categories")
+        raise HTTPException(status_code=500, detail="Failed to fetch categories")
 
 @app.get("/api/categories/{category}/posts")
 async def get_posts_by_category(category: str):
@@ -187,10 +184,8 @@ async def get_posts_by_category(category: str):
         )
         return result.data or []
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to fetch {category}-related posts: {str(e)}"
-        )
+        logger.exception("Failed to fetch posts for category %s", category)
+        raise HTTPException(status_code=500, detail="Failed to fetch category-related posts")
 
 @app.get("/api/authors")
 async def get_authors():
@@ -212,15 +207,31 @@ async def get_authors():
         )
         return result.data or []
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to fetch posts: {str(e)}"
-        )
+        logger.exception("Failed to fetch authors")
+        raise HTTPException(status_code=500, detail="Failed to fetch authors")
 
-# Author API
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
+
+# Lifecycle events
+@app.lifespan("startup")
+async def on_startup():
+    logger.info("Starting journal-on...")
+
+
+@app.lifespan("shutdown")
+async def on_shutdown():
+    logger.info("Shutting down journal-on...")
+
+# Author API: TBD
 
 
 #Run the app
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", "8000"))
+    uvicorn.run(app, host=host, port=port)
