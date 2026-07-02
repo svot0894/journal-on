@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useState } from "react";
+import { Link } from "react-router-dom";
 import { PublicHeader } from "../components/layout/PublicHeader";
 import { BlogState } from "../states/BlogState";
 import { LayersIcon, HashIcon } from "lucide-react";
@@ -17,9 +18,9 @@ export default function Categories() {
     const categoryCard = (category: string) => {
 
         return (
-            <a
+            <Link
                 key={category}
-                href={`/category/${category}`}
+                to={`/category/${category}`}
                 className="
                     group
                     flex
@@ -60,7 +61,7 @@ export default function Categories() {
                         5 articles
                     </span>
                 </div>
-            </a>
+            </Link>
         );
     };
 

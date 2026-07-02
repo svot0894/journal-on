@@ -1,4 +1,5 @@
 import { useState, useReducer, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { PublicHeader } from "../components/layout/PublicHeader";
 import { BlogState } from "../states/BlogState";
 import type { Post } from "../states/BlogState";
@@ -21,6 +22,7 @@ export default function Home() {
     const categoryPill = (cat: string) => {
         const isSelected = blogState.selected_category === cat;
 
+        
         return (
             <button
                 key={cat}
@@ -41,9 +43,9 @@ export default function Home() {
 
     const postCard = (post: Post) => {
         return (
-            <a
+            <Link
                 key={`/post/${post.id}`}
-                href={`/post/${post.id}`}
+                to={`/post/${post.id}`}
                 className="block bg-white border border-slate-200 rounded-xl overflow-hidden hover:border-emerald-300 hover:shadow-sm transition-all"
             >
                 <div className="overflow-hidden border-b border-slate-200">
@@ -71,7 +73,7 @@ export default function Home() {
                         <span className="text-xs text-slate-500">{post.published_date}</span>
                     </div>
                 </div>
-            </a>
+            </Link>
         )
     };
 
@@ -101,8 +103,8 @@ export default function Home() {
                     </div>
                 )}
                 {blogState._hasFeaturedPosts() ? (
-                    <a
-                        href={`/post/${featuredPostId}`}
+                    <Link
+                        to={`/post/${featuredPostId}`}
                         className="flex flex-col md:flex-row bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-emerald-300 transition-all mb-12"
                     >
                         <div className="md:w-1/2 overflow-hidden">
@@ -141,7 +143,7 @@ export default function Home() {
                                 </span>
                             </div>
                         </div>
-                    </a>
+                    </Link>
                 ) : (
                     <div className="flex flex-col items-center justify-center py-16 bg-white border border-slate-200 rounded-2xl mb-12">
                         <PawPrint className="h-8 w-8 text-emerald-500 mb-3" />
@@ -157,13 +159,13 @@ export default function Home() {
                     <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
                         <h2 className="text-2xl font-semibold text-slate-900">Latest articles</h2>
                         <div className="hidden md:flex items-center gap-2">
-                            <a
-                                href="/tags"
+                            <Link
+                                to="/tags"
                                 className="inline-flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-emerald-700 px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             >
                                 <HashIcon className="h-3.5 w-3.5" />
                                 Tags
-                            </a>
+                            </Link>
                         </div>
                         <div className="flex items-center relative justify-between mb-6 flex-wrap gap-4">
                             <SearchIcon className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />

@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useState } from "react";
+import { Link } from "react-router-dom";
 import { PublicHeader } from "../components/layout/PublicHeader";
 import { BlogState } from "../states/BlogState";
 import { HashIcon } from "lucide-react";
@@ -17,9 +18,9 @@ export default function Tags() {
     const tagCard = (tag: string) => {
 
         return (
-            <a
+            <Link
                 key={tag}
-                href={`/tag/${tag}`}
+                to={`/tag/${tag}`}
                 className="
                     group
                     flex
@@ -60,7 +61,7 @@ export default function Tags() {
                         5 articles
                     </span>
                 </div>
-            </a>
+            </Link>
         );
     };
 
