@@ -1,3 +1,5 @@
+const VITE_API_URL = import.meta.env.VITE_API_URL;
+
 type PostStatus = "draft" | "published";
 
 export interface Post {
@@ -284,7 +286,7 @@ export class BlogState implements IBlogState {
 
     async _fetchPosts(): Promise<Post[]> {
         try {
-            const response = await fetch(`https://humble-enigma-97w69g97xqvq2pqvq-8000.app.github.dev/api/posts`);
+            const response = await fetch(`${VITE_API_URL}/api/posts`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch posts: ${response.status} ${response.statusText}`);
             }
@@ -300,7 +302,7 @@ export class BlogState implements IBlogState {
 
     async _fetchAuthor(): Promise<Author> {
         try {
-            const response = await fetch(`https://humble-enigma-97w69g97xqvq2pqvq-8000.app.github.dev/api/authors`);
+            const response = await fetch(`${VITE_API_URL}/api/authors`);
             if (!response.ok) {
                 return DEFAULT_AUTHOR;
             }
@@ -377,7 +379,7 @@ export class BlogState implements IBlogState {
         }
 
         try {
-            const response = await fetch(`https://humble-enigma-97w69g97xqvq2pqvq-8000.app.github.dev/api/posts/${postId}`);
+            const response = await fetch(`${VITE_API_URL}/api/posts/${postId}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch post: ${response.status} ${response.statusText}`);
             }
