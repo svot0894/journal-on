@@ -215,23 +215,12 @@ async def get_authors():
 async def health_check():
     return {"status": "ok"}
 
-
-# Lifecycle events
-@app.lifespan("startup")
-async def on_startup():
-    logger.info("Starting journal-on...")
-
-
-@app.lifespan("shutdown")
-async def on_shutdown():
-    logger.info("Shutting down journal-on...")
-
 # Author API: TBD
 
 
 #Run the app
 if __name__ == "__main__":
     import uvicorn
-    host = os.getenv("HOST", "0.0.0.0")
-    port = int(os.getenv("PORT", "8000"))
+    host = os.getenv("HOST_VAR", "0.0.0.0")
+    port = int(os.getenv("PORT_VAR", "8000"))
     uvicorn.run(app, host=host, port=port)
