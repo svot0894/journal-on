@@ -7,10 +7,10 @@ import { useAuth } from "../states/AuthState";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { signIn } = useAuth();
 
-  const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("demo123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -21,10 +21,10 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login(username, password);
-      navigate("/");
+      await signIn(email, password);
+      navigate("/workspace");
     } catch {
-      setFormError("Invalid username or password.");
+      setFormError("Invalid email or password.");
     } finally {
       setIsSubmitting(false);
     }
@@ -64,12 +64,12 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                  Username
+                  Email
                 </label>
 
                 <input
-                  value={username}
-                  onChange={(event) => setUsername(event.target.value)}
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
                   placeholder="admin"
                   className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                 />

@@ -1,82 +1,116 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { createClient, type Session, type User } from "@supabase/supabase-js";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_KEY
+);
 
-type AuthStateType = {
-  isAuthenticated: boolean;
-  username: string | null;
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
+// Supabase authentication logic here, such as sign-in, sign-out, and session management.
+async function signInWithEmail(email: string, password: string) {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data.user;
 };
 
-const AuthState = createContext<AuthStateType | null>(null);
+async function signOutFromSupabase() {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    throw new Error(error.message);
+  }
+};
 
-const DEMO_USERNAME = "admin";
-const DEMO_PASSWORD = "demo123";
-const STORAGE_KEY = "pingo_demo_auth";
+async function getCurrentSession() {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data.session;
+};
+
+type AuthContextType = {
+  user: User | null;
+  session: Session | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+};
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 type AuthProviderProps = {
   children: ReactNode;
 };
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function signIn(email: string, password: string) {
+    await signInWithEmail(email, password);
+    const currentSession = await getCurrentSession();
+    setUser(currentSession?.user ?? null);
+    setSession(currentSession);
+  }
+
+  async function signOut() {
+    await signOutFromSupabase();
+    setUser(null);
+    setSession(null);
+  }
 
   useEffect(() => {
-    const storedAuth = localStorage.getItem(STORAGE_KEY);
-    if (!storedAuth) return;
-    try {
-      const parsedAuth = JSON.parse(storedAuth);
-      if (parsedAuth.isAuthenticated) {
-        setIsAuthenticated(true);
-        setUsername(parsedAuth.username ?? null);
+    async function loadSession() {
+      setLoading(true);
+
+      try {
+        const currentSession = await getCurrentSession();
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+      } finally {
+        setLoading(false);
       }
-    } catch {
-      localStorage.removeItem(STORAGE_KEY);
     }
+    loadSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
+      setLoading(false);
+    });
+    return() => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  async function login(usernameInput: string, passwordInput: string) {
-    const cleanUsername = usernameInput.trim();
-    const cleanPassword = passwordInput.trim();
-
-    if (cleanUsername !== DEMO_USERNAME || cleanPassword !== DEMO_PASSWORD) {
-      throw new Error("Invalid demo credentials.");
-    };
-
-    const authState = {
-      isAuthenticated: true,
-      username: cleanUsername,
-    };
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(authState));
-    setIsAuthenticated(true);
-    setUsername(cleanUsername);
-  }
-
-  function logout() {
-    localStorage.removeItem(STORAGE_KEY);
-    setIsAuthenticated(false);
-    setUsername(null);
-  }
-
   return (
-    <AuthState.Provider value={{ isAuthenticated, username, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        isAuthenticated: !!session,
+        loading,
+        signIn,
+        signOut,
+      }}
+    >
       {children}
-    </AuthState.Provider>
+    </AuthContext.Provider>
   );
-};
+}
 
 export function useAuth() {
-  const context = useContext(AuthState);
+  const context = useContext(AuthContext);
+
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useAuth must be used inside AuthProvider");
   }
+
   return context;
 }

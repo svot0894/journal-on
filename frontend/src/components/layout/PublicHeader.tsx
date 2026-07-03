@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../states/AuthState";
 
 export function PublicHeader() {
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, signOut } = useAuth();
 
     return (
         <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
@@ -28,7 +28,7 @@ export function PublicHeader() {
                             <Link className="text-sm font-medium text-slate-600 hover:text-emerald-600" to="/workspace">
                                 Workspace
                             </Link>
-                            <button onClick={logout} className="text-sm font-medium text-slate-600 hover:text-emerald-600">
+                            <button onClick={signOut} className="text-sm font-medium text-slate-600 hover:text-emerald-600">
                                 Sign out
                             </button>
                         </div>
