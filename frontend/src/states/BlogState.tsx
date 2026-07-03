@@ -310,10 +310,10 @@ export class BlogState implements IBlogState {
             const authorData = Array.isArray(payload)
                 ? payload[0]
                 : payload?.data
-                ? Array.isArray(payload.data)
-                    ? payload.data[0]
-                    : payload.data
-                : payload;
+                    ? Array.isArray(payload.data)
+                        ? payload.data[0]
+                        : payload.data
+                    : payload;
 
             const row = typeof authorData === "object" && authorData !== null ? authorData : null;
             if (!row) {
@@ -359,45 +359,60 @@ export class BlogState implements IBlogState {
         this.search_query = query;
     }
 
-    async _loadPostFromRoute() {
+    async _loadPostById(postId: string) {
+        this.is_loading = true;
+        this.load_error = "";
+        this.current_post_id = postId;
+
         if (!this.is_initialized) {
             this.author = await this._fetchAuthor();
             this.posts = await this._fetchPosts();
             this.is_initialized = true;
         }
-        this.is_loading = true;
-        this.load_error = "";
-        const postId = this._resolvePostId();
-        this.current_post_id = postId;
 
-        for (const p of this.posts) {
-            if (p.id === postId && p.status === "published") {
-                this.current_post = p;
-                this.is_loading = false;
-                return;
-            }
+        const existingPost = this.posts.find(
+            (p) => p.id === postId && p.status === "published"
+        );
+
+        if (existingPost) {
+            this.current_post = existingPost;
+            this.is_loading = false;
+            return;
         }
 
         try {
             const response = await fetch(`${VITE_API_URL}/api/posts/${postId}`);
+
             if (!response.ok) {
-                throw new Error(`Failed to fetch post: ${response.status} ${response.statusText}`);
+                throw new Error(
+                    `Failed to fetch post: ${response.status} ${response.statusText}`
+                );
             }
+
             const payload = await response.json();
-            const rows = Array.isArray(payload) ? payload : payload?.data || [];
-            if (rows.length > 0) {
-                this.current_post = this._normalizePost(rows[0]);
+
+            const row = Array.isArray(payload)
+                ? payload[0]
+                : payload?.data
+                    ? Array.isArray(payload.data)
+                        ? payload.data[0]
+                        : payload.data
+                    : payload;
+
+            if (row) {
+                this.current_post = this._normalizePost(row);
                 this.is_loading = false;
                 return;
             }
-        } catch (e) {
-            console.error("Error:", e);
+        } catch (error) {
+            console.error("Error loading post:", error);
         }
 
         this.current_post = {
             id: "",
             title: "Post Not Found",
-            excerpt: "The post you are trying to find doesn't exist, has been moved, or is not published.",
+            excerpt:
+                "The post you are trying to find doesn't exist, has been moved, or is not published.",
             content: "The requested article is missing.",
             category: "General",
             tags: [],
@@ -408,6 +423,7 @@ export class BlogState implements IBlogState {
             status: "published",
             views: 0,
         };
+
         this.load_error = "Post not found.";
         this.is_loading = false;
     }
@@ -460,13 +476,4 @@ export class BlogState implements IBlogState {
         this.search_query = "";
         this.selected_category = "All";
     }
-
-    _navToPost(postId: string) {
-        return this.router.redirect(`/post/${postId}`);
-    }
-
-    _navToHome() {
-        return this.router.redirect("/");
-    }
-
 }
