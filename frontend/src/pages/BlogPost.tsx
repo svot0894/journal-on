@@ -1,4 +1,4 @@
-import { useState, useReducer, useEffect, Fragment } from "react";
+import { useState, useReducer, useEffect } from "react";
 import { ArrowLeftIcon, CircleAlertIcon } from "lucide-react";
 import { PublicHeader } from "../components/layout/PublicHeader";
 import { BlogState } from "../states/BlogState";
@@ -30,7 +30,7 @@ export default function BlogPost() {
         return (
             <Link to={`/post/${post.id}`} key={post.id} className="block bg-white border border-slate-200 rounded-xl overflow-hidden hover:border-blue-300 transition-all">
                 <div className="overflow-hidden border-b border-slate-200">
-                    <img src={post.cover_image} className="w-full h-32 object-cover" />
+                    <img src={post.cover_image ?? undefined} className="w-full h-32 object-cover" />
                 </div>
                 <div className="p-4">
                     <span className="text-xs font-medium text-blue-600">{post.category}</span>
@@ -83,7 +83,7 @@ export default function BlogPost() {
                                 <p className="text-xs text-slate-500">{post.published_date} • {post.read_time}</p>
                             </div>
                         </div>
-                        <img src={post.cover_image} className="w-full h-64 md:h-96 object-cover rounded-2xl border border-slate-200 mb-10"></img>
+                        <img src={post.cover_image ?? undefined} className="w-full h-64 md:h-96 object-cover rounded-2xl border border-slate-200 mb-10" />
                         <div className="mb-10">
                             <article className="prose prose-slate max-w-none prose-headings:font-semibold prose-headings:text-slate-900 prose-p:text-slate-700 prose-a:text-blue-600">
                                 <ReactMarkdown>
