@@ -8,6 +8,7 @@ import BlogPost from "./pages/BlogPost";
 import Categories from "./pages/Categories";
 import Tags from "./pages/Tags";
 import Workspace from "./pages/Workspace";
+import Editor from "./pages/Editor";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/categories" element={<Categories />} />
           <Route path="/tags" element={<Tags />} />
           <Route path="/workspace" element={<Workspace />} />
+          <Route path="/editor" element={<Editor />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
