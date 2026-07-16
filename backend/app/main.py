@@ -210,12 +210,319 @@ async def get_authors():
         logger.exception("Failed to fetch authors")
         raise HTTPException(status_code=500, detail="Failed to fetch authors")
 
+# Admin API for fetching author's posts, running edits, deletes and profile updates.
+
+# this one fetchs all posts, not just published posts.
+@app.get("/api/admin/posts")
+async def get_admin_posts():
+    client = get_supabase()
+
+    if client is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database unavailable.",
+        )
+    
+    try:
+        result = (
+            client.table("blog_posts")
+            .select("*")
+            .order("published_date", desc=True)
+            .execute()
+        )
+        return result.data or []
+    except Exception:
+        logger.exception("Failed to fetch admin posts.")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to fetch admin posts",
+        )
+
+@app.get("/api/admin/posts/{post_id}")
+async def get_admin_post(post_id: str):
+    client = get_supabase()
+
+    if client is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database unavailable.",
+        )
+    
+    try:
+        result = (
+            client.table("blog_posts")
+            .select("*")
+            .eq("id", post_id)
+            .limit(1)
+            .execute()
+        )
+        rows = result.data or []
+
+        if not rows:
+            raise HTTPException(
+                status_code=404,
+                detail="Post not found.",
+            )
+        
+        return rows[0]
+    except Exception:
+        logger.exception("Failed to fetch admin posts %s.", post_id)
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to fetch post.",
+        )
+
+@app.post("/api/admin/posts")
+async def create_admin_post(payload: dict):
+    client = get_supabase()
+
+    if client is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database unavailable.",
+        )
+
+    try:
+        result = (
+            client.table("blog_posts")
+            .insert(payload)
+            .execute()
+        )
+
+        rows = result.data or []
+
+        if not rows:
+            raise HTTPException(
+                status_code=500,
+                detail="Insert failed"
+            )
+
+        return rows[0]
+
+    except HTTPException:
+        raise
+
+    except Exception:
+        logger.exception(
+            "Failed to create post"
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to create post"
+        )
+
+@app.patch("/api/admin/posts/{post_id}")
+async def update_admin_post(
+    post_id: str,
+    payload: dict
+):
+    client = get_supabase()
+
+    if client is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database unavailable.",
+        )
+
+    try:
+        result = (
+            client.table("blog_posts")
+            .update(payload)
+            .eq("id", post_id)
+            .execute()
+        )
+
+        rows = result.data or []
+
+        if not rows:
+            raise HTTPException(
+                status_code=404,
+                detail="Post not found",
+            )
+
+        return rows[0]
+
+    except HTTPException:
+        raise
+
+    except Exception:
+        logger.exception(
+            "Failed to update post %s",
+            post_id,
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to update post",
+        )
+
+@app.delete("/api/admin/posts/{post_id}")
+async def delete_admin_post(post_id: str):
+    client = get_supabase()
+
+    if client is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database unavailable.",
+        )
+
+    try:
+        (
+            client.table("blog_posts")
+            .delete()
+            .eq("id", post_id)
+            .execute()
+        )
+
+        return {
+            "success": True
+        }
+
+    except Exception:
+        logger.exception(
+            "Failed to delete post %s",
+            post_id,
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to delete post",
+        )
+
+@app.patch("/api/admin/posts/{post_id}/status")
+async def update_post_status(
+    post_id: str,
+    payload: dict,
+):
+    client = get_supabase()
+
+    if client is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database unavailable.",
+        )
+
+    try:
+        result = (
+            client.table("blog_posts")
+            .update(
+                {
+                    "status": payload.status,
+                    "published_date":
+                        payload.published_date,
+                }
+            )
+            .eq("id", post_id)
+            .execute()
+        )
+
+        rows = result.data or []
+
+        if not rows:
+            raise HTTPException(
+                status_code=404,
+                detail="Post not found",
+            )
+
+        return rows[0]
+
+    except HTTPException:
+        raise
+
+    except Exception:
+        logger.exception(
+            "Failed to update status"
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to update status",
+        )
+
+@app.get("/api/admin/profile")
+async def get_admin_profile():
+    client = get_supabase()
+
+    if client is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database unavailable.",
+        )
+
+    try:
+        result = (
+            client.table("blog_author_profile")
+            .select("*")
+            .eq("id", "primary")
+            .limit(1)
+            .execute()
+        )
+
+        rows = result.data or []
+
+        if not rows:
+            return {}
+
+        return rows[0]
+
+    except Exception:
+        logger.exception(
+            "Failed to fetch profile"
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to fetch profile",
+        )
+
+@app.patch("/api/admin/profile")
+async def update_admin_profile(
+    payload: dict
+):
+    client = get_supabase()
+
+    if client is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database unavailable.",
+        )
+
+    try:
+        result = (
+            client.table("blog_author_profile")
+            .update(payload)
+            .eq("id", "primary")
+            .execute()
+        )
+
+        rows = result.data or []
+
+        if not rows:
+            raise HTTPException(
+                status_code=404,
+                detail="Profile not found",
+            )
+
+        return rows[0]
+
+    except HTTPException:
+        raise
+
+    except Exception:
+        logger.exception(
+            "Failed to update profile"
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to update profile",
+        )
+    
 
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
-
-# Author API: TBD
 
 
 #Run the app
