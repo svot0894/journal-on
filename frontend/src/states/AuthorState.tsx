@@ -506,7 +506,7 @@ export class AuthorState implements IAuthorState {
             );
 
             if (!response.ok) {
-                throw new Error("Failed to update post status.");
+                throw new Error("Failed to update post statusß");
             }
 
             await this._loadPostsRows();
