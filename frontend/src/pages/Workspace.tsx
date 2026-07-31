@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useState, useReducer, useEffect } from "react";
 import { FileTextIcon, CircleCheckIcon, CircleDashedIcon, EyeIcon, CircleAlertIcon, PlusIcon, RefreshCwIcon, Globe, Lock, GlobeIcon, LockIcon, PencilIcon, EyeOffIcon, SendIcon, Trash2Icon, PawPrintIcon } from "lucide-react";
 import { AuthorHeader } from "../components/layout/AuthorHeader";
@@ -5,7 +6,7 @@ import { useAuth } from "../states/AuthState";
 import { AuthorState, type AuthorPost } from "../states/AuthorState";
 
 export default function Workspace() {
-
+    const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
 
     const [authorState] = useState(() => new AuthorState());
@@ -61,21 +62,27 @@ export default function Workspace() {
                 <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
                         <button
-                            onClick={() => { void authorState._loadEditor(post.id); authorState._refresh();}}
+                            onClick={() => navigate(`/editor/${post.id}`)}
                             className="p-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                         >
                             <PencilIcon className="h-3.5 w-3.5" />
                             Edit
                         </button>
                         <button
-                            onClick={() => { void authorState._togglePublishStatus(post.id); }}
+                            onClick={async () => {
+                                await authorState._togglePublishStatus(post.id);
+                                forceRender();
+                            }}
                             className="p-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                         >
                             {post.status === "published" ? <EyeOffIcon className="w-3.5 h-3.5" /> : <SendIcon className="w-3.5 h-3.5" />}
                             Status
                         </button>
                         <button
-                            onClick={() => { void authorState._deletePost(post.id); authorState._refresh();}}
+                            onClick={async () => {
+                                await authorState._deletePost(post.id);
+                                forceRender();
+                            }}
                             className="p-1.5 rounded-md border border-slate-200 bg-white text-red-600 hover:bg-red-50"
                         >
                             <Trash2Icon className="h-3.5 w-3.5" />
@@ -111,7 +118,7 @@ export default function Workspace() {
                     </div>
                     <button
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700"
-                        onClick={() => { window.location.href = '/editor'; }}
+                        onClick={() => navigate('/editor')}
                     >
                         <PlusIcon className="w-4 h-4" />
                         New story
@@ -125,7 +132,7 @@ export default function Workspace() {
                             <p className="text-xs text-slate-600 mt-0.5">{authorState.load_error}</p>
                         </div>
                         <button onClick={() => {
-                            authorState._refresh();
+                            forceRender();
                         }} className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-100 text-amber-800 text-sm font-medium hover:bg-amber-200">
                             <RefreshCwIcon className="w-3.5 h-3.5" />
                             Retry
