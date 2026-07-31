@@ -406,13 +406,7 @@ async def update_post_status(
     try:
         result = (
             client.table("blog_posts")
-            .update(
-                {
-                    "status": payload.status,
-                    "published_date":
-                        payload.published_date,
-                }
-            )
+            .update(payload)
             .eq("id", post_id)
             .execute()
         )
