@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useReducer, useEffect } from "react";
-import { FileTextIcon, CircleCheckIcon, CircleDashedIcon, EyeIcon, CircleAlertIcon, PlusIcon, RefreshCwIcon, Globe, Lock, GlobeIcon, LockIcon, PencilIcon, EyeOffIcon, SendIcon, Trash2Icon, PawPrintIcon } from "lucide-react";
+import { FileTextIcon, CircleCheckIcon, CircleDashedIcon, EyeIcon, CircleAlertIcon, PlusIcon, RefreshCwIcon, GlobeIcon, LockIcon, PencilIcon, EyeOffIcon, SendIcon, Trash2Icon, PawPrintIcon } from "lucide-react";
 import { AuthorHeader } from "../components/layout/AuthorHeader";
 import { useAuth } from "../states/AuthState";
 import { AuthorState, type AuthorPost } from "../states/AuthorState";
@@ -91,18 +91,6 @@ export default function Workspace() {
                     </div>
                 </td>
             </tr>
-        )
-    };
-
-    const _quickAction = (label: string, icon: string, on_click: any) => {
-        return (
-            <button
-                onClick={on_click}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/30 transition-colors"
-            >
-                {icon}
-                <span className="text-sm font-medium text-slate-700">{label}</span>
-            </button>
         )
     };
 

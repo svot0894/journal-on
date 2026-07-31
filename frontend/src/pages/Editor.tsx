@@ -1,12 +1,11 @@
-import { ChevronDownIcon, LockIcon } from "lucide-react";
+import { LockIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../states/AuthState";
-import { AuthorHeader } from "../components/layout/AuthorHeader";
 
 export default function Editor() {
     const { isAuthenticated } = useAuth();
 
-    const categoryOption = (cat: string) => {
+    /*const categoryOption = (cat: string) => {
         return (
             <option value={cat}>{cat}</option>
         )
@@ -27,9 +26,9 @@ export default function Editor() {
                 ) : null}
             </div>
         )
-    };
+    };*/
 
-    const editorForm = () => {
+     /* const editorForm = () => {
         return (
             <div>
                 <div className="mb-5">
@@ -59,12 +58,11 @@ export default function Editor() {
                 { }
             </div>
         )
-    };
+    };*/
 
     return (
         isAuthenticated ? (
             <main className="font-['Inter'] bg-gray-50 min-h-screen">
-                <AuthorHeader />
                 <h1>test</h1>
             </main>
         ) : (
