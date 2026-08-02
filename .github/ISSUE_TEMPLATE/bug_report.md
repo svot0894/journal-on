@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Something that needs to fixed / improved.
-title: ''
+title: "[ BUG ]"
 labels: bug
 assignees: svot0894
 
