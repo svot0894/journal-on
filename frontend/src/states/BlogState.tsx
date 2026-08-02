@@ -153,40 +153,32 @@ export class BlogState implements IBlogState {
         return Object.keys(seen).sort((a, b) => seen[b] - seen[a]);
     }
 
-    _tagCounts(): { tag: string; count: number }[] {
-        const seen: { [key: string]: number } = {};
+    _tagCount(tag: string): number {
+        let tagCount: number = 0;
+
         for (const p of this.posts) {
             if (p.status !== "published") {
                 continue;
             }
-            for (const tag of p.tags) {
-                if (!seen[tag]) {
-                    seen[tag] = 1;
-                } else {
-                    seen[tag]++;
-                }
+            if (p.tags.includes(tag)) {
+                tagCount++;
             }
         }
-        return Object.keys(seen)
-            .sort((a, b) => seen[b] - seen[a])
-            .map((tag) => ({ tag, count: seen[tag] }));
+        return tagCount;
     }
 
-    _categoryCounts(): { category: string; count: number }[] {
-        const seen: { [key: string]: number } = {};
+    _categoryCount(category: string): number {
+        let catCount: number = 0;
+
         for (const p of this.posts) {
             if (p.status !== "published") {
                 continue;
             }
-            if (!seen[p.category]) {
-                seen[p.category] = 1;
-            } else {
-                seen[p.category]++;
+            if (p.category.toLowerCase() === category.toLowerCase()) {
+                catCount++;
             }
         }
-        return Object.keys(seen)
-            .sort((a, b) => seen[b] - seen[a])
-            .map((category) => ({ category, count: seen[category] }));
+        return catCount;
     }
 
     _currentTagPosts(): Post[] {
