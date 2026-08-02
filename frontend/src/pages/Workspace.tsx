@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useReducer, useEffect } from "react";
 import { FileTextIcon, CircleCheckIcon, CircleDashedIcon, EyeIcon, CircleAlertIcon, PlusIcon, RefreshCwIcon, GlobeIcon, LockIcon, PencilIcon, EyeOffIcon, SendIcon, Trash2Icon, PawPrintIcon } from "lucide-react";
 import { AuthorHeader } from "../components/layout/AuthorHeader";
@@ -96,8 +96,9 @@ export default function Workspace() {
 
 
     return (
+        isAuthenticated ? (
         <main className="font-['Inter'] bg-stone-50 min-h-screen">
-            {isAuthenticated ? AuthorHeader("workspace") : null}
+            {AuthorHeader("workspace")}
             <div className="max-w-6xl mx-auto px-6 py-10">
                 <div className="flex items-start justify-between mb-8 flex-wrap gap-4">
                     <div>
@@ -173,5 +174,14 @@ export default function Workspace() {
                 </div>
             </div>
         </main>
+    ) : (
+            <main className="font-['Inter'] bg-gray-50">
+                <div className="flex flex-col items-center justify-center min-h-screen">
+                    <LockIcon className="h-8 w-8 text-slate-400 mb-3" />
+                    <p className="text-slate-600 mb-4">Sign in required.</p>
+                    <Link to="/login" className="px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium">Sign in</Link>
+                </div>
+            </main>
+        )
     )
 }
